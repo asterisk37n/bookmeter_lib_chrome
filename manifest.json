@@ -6,7 +6,9 @@
   "permissions": [
     "tabs",
     "activeTab",
-    "<all_urls>"
+    "<all_urls>",
+    "http://ajax.googleapis.com/ajax/libs/jquery/*",
+    "http://calil.jp/public/*"
   ],
   "icons": {
     "16": "icon16.png",
@@ -21,7 +23,7 @@
     {
       // "mathces": ["http://www.google.com/*"],
       // "matches": ["http://bookmeter.com/*", "http://www.bookmeter.com/*"],
-      "matches":["http://bookmeter.com/*", "http://www.bookmeter.com/*"],
+      "matches":["http://bookmeter.com/b/*", "http://www.bookmeter.com/b*/"],
       "js": ["content.js"]
     }
   ],
@@ -34,7 +36,7 @@
     "default_popup": "popup.html"
   },
   "manifest_version": 2,
+  "content_security_policy":"script-src 'self' https://calil.jp; object-src 'self'",
   "sandbox":{
-    "content_security_policy": "sandbox allow-scripts;"
-  }  
+    }  
 }
