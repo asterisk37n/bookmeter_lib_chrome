@@ -1,24 +1,40 @@
 {
   "name": "Library search",
   "description": "find a book from a library on bookmeter.com",
-  "version": "2.1",
+  "version": "0.1",
+  "minimum_chrome_version": "16.0.884",
   "permissions": [
     "tabs",
     "activeTab",
     "<all_urls>"
   ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
   "background": {
     "scripts": ["background.js"],
     "persistent": false
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      // "mathces": ["http://www.google.com/*"],
+      // "matches": ["http://bookmeter.com/*", "http://www.bookmeter.com/*"],
+      "matches":["http://bookmeter.com/*", "http://www.bookmeter.com/*"],
       "js": ["content.js"]
     }
   ],
-  "browser_action": {
-    "default_title": "Find books from a library"
+  "page_action": {
+    "default_icon": {                    // optional
+      "19": "icon19.png",           // optional
+      "38": "icon38.png"            // optional
+    },
+    "default_title": "Find books from a library",
+    "default_popup": "popup.html"
   },
-  "manifest_version": 2
+  "manifest_version": 2,
+  "sandbox":{
+    "content_security_policy": "sandbox allow-scripts;"
+  }  
 }

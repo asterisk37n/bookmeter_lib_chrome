@@ -4,19 +4,26 @@
 
 // Called when the user clicks on the browser action.
 console.log('Bckground script started');
-chrome.browserAction.onClicked.addListener(function(tab) {
+chrome.tabs.onUpdated.addListener(showIcon);
+function showIcon(tabId, changeInfo, tab) {
+ if (tab.url.match(/^https?:\/\/w*.?bookmeter.com/) != null) {
+ 	chrome.pageAction.show(tabId);
+ 	console.log(changeInfo);
+  };
+};
+// chrome.browserAction.onClicked.addListener(function(tab) {
   // No tabs or host permissions needed!
   // chrome.tabs.executeScript({
   //    code: 'document.body.style.backgroundColor="red"'
   // });
-});
+// });
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     console.log(sender.tab ? "I got a message from a content script:" + sender.tab.url : "from the extension");
     if (request.greeting == "hi background") {
     	var isbn = request.isbn;
-    	console.log(isbn);
+    	console.log(isbn+" in background");
      	sendResponse({farewell: "goodbye"});
     }
   }
