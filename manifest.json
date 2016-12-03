@@ -21,16 +21,14 @@
   },
   "content_scripts": [
     {
-      // "mathces": ["http://www.google.com/*"],
-      // "matches": ["http://bookmeter.com/*", "http://www.bookmeter.com/*"],
       "matches":["http://bookmeter.com/b/*", "http://www.bookmeter.com/b*/"],
       "js": ["content.js"]
     }
   ],
   "page_action": {
-    "default_icon": {                    // optional
-      "19": "icon19.png",           // optional
-      "38": "icon38.png"            // optional
+    "default_icon": {
+      "19": "icon19.png",
+      "38": "icon38.png"
     },
     "default_title": "Find books from a library",
     "default_popup": "popup.html"
