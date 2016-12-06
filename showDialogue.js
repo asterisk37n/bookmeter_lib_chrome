@@ -1,5 +1,5 @@
 var city_selector = new CalilCitySelectDlg({
-	'appkey' : 'your app key',
+	'appkey' : '02e69dccae66fb1e1c4c0b5364bbfedc',
 	'select_func' : on_select_city
 });
 function on_select_city(systemid_list, pref_name){
