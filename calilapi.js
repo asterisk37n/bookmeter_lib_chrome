@@ -396,7 +396,7 @@ CalilCitySelectDlg.prototype = {
 		$('#calil_pref_selector a').each(function(i, e){
 			var temp = $(e).attr('href').split('/');
 			var pref = temp[temp.length-1];
-			$(e).attr('href', 'javascript:void(0)').click(function(){
+			$(e).attr('href', '#').click(function(){
 				self.load_pref(pref);
 			});
 		});
@@ -491,7 +491,7 @@ CalilCitySelectDlg.prototype = {
 		$("#calil_city_selector .calil_pref_list a").each(function(i, e){
 			var temp = $(e).attr('href').split('/');
 			var pref = temp[temp.length-1];
-			$(e).attr('href', 'javascript:void(0)').click(function(){
+			$(e).attr('href', '#').click(function(){
 				self.get_systemid(pref);
 			});
 		});
@@ -558,10 +558,10 @@ CalilCitySelectDlg.prototype = {
 '<div id="calil_place_dialog_wrapper">',
 '<div id="calil_place_dialog">',
 '	<div class="calil_dlg_content">',
-'		<div style="float:right;font-size:140%;"><a href="javascript:void(0)" class="calil_place_dialog_close">[×]</a></div>',
+'		<div style="float:right;font-size:140%;"><a href="#" class="calil_place_dialog_close">[×]</a></div>',
 '		<h3>図書館のエリアを選んでください。</h3>',
 '		<div id = "calil_city_selector" style="display:none;">',
-'		<a href="javascript:void(0)" class="calil_hide_city">« 戻る</a>',
+'		<a href="#" class="calil_hide_city">« 戻る</a>',
 '		<div class="calil_pref_list">&nbsp;</div>',
 '		</div>',
 '',
