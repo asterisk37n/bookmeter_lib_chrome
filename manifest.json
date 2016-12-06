@@ -19,7 +19,7 @@
   },
   "content_scripts": [
     {
-      "matches":["http://bookmeter.com/b/*", "http://www.bookmeter.com/b*/"],
+      "matches":["http://bookmeter.com/b/*", "http://www.bookmeter.com/books/*"],
       "js": ["content.js"]
     }
   ],
