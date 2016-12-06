@@ -19,7 +19,7 @@
   },
   "content_scripts": [
     {
-      "matches":["https://elk.bookmeter.com/b/*", "https://elk.bookmeter.com/books/*"],
+      "matches":["https://elk.bookmeter.com/books/*"],
       "js": ["content.js"]
     }
   ],
