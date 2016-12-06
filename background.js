@@ -6,7 +6,7 @@
 console.log('Bckground script started');
 chrome.tabs.onUpdated.addListener(showIcon);
 function showIcon(tabId, changeInfo, tab) {
- if (tab.url.match(/^https?:\/\/w*.?bookmeter.com/) != null) {
+ if (tab.url.match(/^https?:\/\/elk.bookmeter.com/) != null) {
  	chrome.pageAction.show(tabId);
  	console.log(changeInfo);
   };
