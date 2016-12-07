@@ -52,7 +52,7 @@ Calil.prototype = {
 		$("#"+isbn).attr("status","");
 	},
 	search : function() {
-		var domain = "//api.calil.jp";
+		var domain = "https://api.calil.jp";
 		var apiurl = domain + "/check?appkey="+this.appkey+"&systemid="+ this.systemid_list.join(',') +"&isbn="+ this.isbn_list.join(',');
 		this.call_api(apiurl);
 
@@ -102,7 +102,7 @@ Calil.prototype = {
 			if (this.api_call_count > 7){
 				seconds = 5000;
 			}
-			var newurl = "//api.calil.jp/check?appkey="+this.appkey+"&session=" + session;
+			var newurl = "https://api.calil.jp/check?appkey="+this.appkey+"&session=" + session;
 			var self = this;
 			setTimeout(function(){
 				self.call_api(newurl);
@@ -437,7 +437,7 @@ CalilCitySelectDlg.prototype = {
 			this.expand_city();
 			return;
 		}
-		var url = "//calil.jp/city_list";
+		var url = "https://calil.jp/city_list";
 		var self = this;
 		if(typeof GM_xmlhttpRequest == 'function'){
 			GM_xmlhttpRequest({
@@ -509,7 +509,7 @@ CalilCitySelectDlg.prototype = {
 		var city = temp[1];
 		pref = encodeURIComponent(pref);
 		city = encodeURIComponent(city);
-		var url = '//api.calil.jp/library?appkey='+this.appkey+'&format=json&pref='+pref+'&city='+city;
+		var url = 'https://api.calil.jp/library?appkey='+this.appkey+'&format=json&pref='+pref+'&city='+city;
 		var self = this;
 		if(typeof GM_xmlhttpRequest == 'function'){
 			GM_xmlhttpRequest({
