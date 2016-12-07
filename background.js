@@ -1,8 +1,7 @@
-// Copyright (c) 2011 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
+// Copyright (c) 2016 Naoki Watanabe and Shinya Onuma
+// Use of this source code is governed by xxx license that can be
 // found in the LICENSE file.
 
-// Called when the user clicks on the browser action.
 console.log('Bckground script started');
 chrome.tabs.onUpdated.addListener(showIcon);
 function showIcon(tabId, changeInfo, tab) {
@@ -11,20 +10,18 @@ function showIcon(tabId, changeInfo, tab) {
  	console.log(changeInfo);
   };
 };
-// chrome.browserAction.onClicked.addListener(function(tab) {
-  // No tabs or host permissions needed!
-  // chrome.tabs.executeScript({
-  //    code: 'document.body.style.backgroundColor="red"'
-  // });
-// });
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     console.log(sender.tab ? "I got a message from a content script:" + sender.tab.url : "from the extension");
-    if (request.greeting == "hi background") {
+    if (request.greeting == "I am content") {
     	var isbn = request.isbn;
     	console.log(isbn+" in background");
      	sendResponse({farewell: "goodbye"});
+    } else if(request.greeting == "I am popup") {
+        var systemid_list = request.systemid_list;
+        var pref_name = request.pref_name;
+        sendResponse({farewell: "bye bye"});
     }
   }
 );

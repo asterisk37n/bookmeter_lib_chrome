@@ -9,14 +9,10 @@ window.onload = function() {
   sendLinksToBackground(isbn);
 };
 
-document.onload = function() {
-	console.log("HHHHH");
-};
-
 function sendLinksToBackground(isbn) {
   console.log("sending message from content to background");
   chrome.runtime.sendMessage({
-      greeting: "hi background",
+      greeting: "I am content",
       isbn: isbn
     },
     function(response) {
