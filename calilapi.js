@@ -52,7 +52,7 @@ Calil.prototype = {
 		$("#"+isbn).attr("status","");
 	},
 	search : function() {
-		var domain = "//api.calil.jp";
+		var domain = "https://api.calil.jp";
 		var apiurl = domain + "/check?appkey="+this.appkey+"&systemid="+ this.systemid_list.join(',') +"&isbn="+ this.isbn_list.join(',');
 		this.call_api(apiurl);
 
@@ -102,7 +102,7 @@ Calil.prototype = {
 			if (this.api_call_count > 7){
 				seconds = 5000;
 			}
-			var newurl = "//api.calil.jp/check?appkey="+this.appkey+"&session=" + session;
+			var newurl = "https://api.calil.jp/check?appkey="+this.appkey+"&session=" + session;
 			var self = this;
 			setTimeout(function(){
 				self.call_api(newurl);
@@ -396,7 +396,7 @@ CalilCitySelectDlg.prototype = {
 		$('#calil_pref_selector a').each(function(i, e){
 			var temp = $(e).attr('href').split('/');
 			var pref = temp[temp.length-1];
-			$(e).attr('href', 'javascript:void(0)').click(function(){
+			$(e).attr('href', '#').click(function(){
 				self.load_pref(pref);
 			});
 		});
@@ -437,7 +437,7 @@ CalilCitySelectDlg.prototype = {
 			this.expand_city();
 			return;
 		}
-		var url = "//calil.jp/city_list";
+		var url = "https://calil.jp/city_list";
 		var self = this;
 		if(typeof GM_xmlhttpRequest == 'function'){
 			GM_xmlhttpRequest({
@@ -491,7 +491,7 @@ CalilCitySelectDlg.prototype = {
 		$("#calil_city_selector .calil_pref_list a").each(function(i, e){
 			var temp = $(e).attr('href').split('/');
 			var pref = temp[temp.length-1];
-			$(e).attr('href', 'javascript:void(0)').click(function(){
+			$(e).attr('href', '#').click(function(){
 				self.get_systemid(pref);
 			});
 		});
@@ -509,7 +509,7 @@ CalilCitySelectDlg.prototype = {
 		var city = temp[1];
 		pref = encodeURIComponent(pref);
 		city = encodeURIComponent(city);
-		var url = '//api.calil.jp/library?appkey='+this.appkey+'&format=json&pref='+pref+'&city='+city;
+		var url = 'https://api.calil.jp/library?appkey='+this.appkey+'&format=json&pref='+pref+'&city='+city;
 		var self = this;
 		if(typeof GM_xmlhttpRequest == 'function'){
 			GM_xmlhttpRequest({
@@ -558,10 +558,10 @@ CalilCitySelectDlg.prototype = {
 '<div id="calil_place_dialog_wrapper">',
 '<div id="calil_place_dialog">',
 '	<div class="calil_dlg_content">',
-'		<div style="float:right;font-size:140%;"><a href="javascript:void(0)" class="calil_place_dialog_close">[×]</a></div>',
+'		<div style="float:right;font-size:140%;"><a href="#" class="calil_place_dialog_close">[×]</a></div>',
 '		<h3>図書館のエリアを選んでください。</h3>',
 '		<div id = "calil_city_selector" style="display:none;">',
-'		<a href="javascript:void(0)" class="calil_hide_city">« 戻る</a>',
+'		<a href="#" class="calil_hide_city">« 戻る</a>',
 '		<div class="calil_pref_list">&nbsp;</div>',
 '		</div>',
 '',
