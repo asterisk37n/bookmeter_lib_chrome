@@ -391,7 +391,8 @@ CalilCitySelectDlg.prototype = {
 		this.selectFunc = options.select_func || false;
 		var self = this;
 		$('.calil_place_dialog_close').click(function(){
-			self.closeDlg();
+			close();
+			//self.closeDlg();
 		});
 		$('#calil_pref_selector a').each(function(i, e){
 			var temp = $(e).attr('href').split('/');
@@ -527,9 +528,11 @@ CalilCitySelectDlg.prototype = {
 					dataType: "jsonp",
 					success:function(data){
 							self.set_systemid(data, raw_pref);
+							close();
 					},
 					error:function(){
 							alert('error');
+							close();
 					}
 			});	
 		}
