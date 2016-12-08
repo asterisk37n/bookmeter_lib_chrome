@@ -51,14 +51,14 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 });
 
 function requestCheck(app_key, isbn, systemid_list) {
-    var url = "https://api.calil.jp/check?appkey="+app_key+"&isbn="+isbn+"&systemid="+systemid_list.join(",")+"&format=json&callback=callback_check";
+    var url = "https://api.calil.jp/check?appkey="+app_key+"&isbn="+isbn+"&systemid="+systemid_list.join(",")+"&format=json&callback=callbackCheck";
     console.log(url);
     var script = document.createElement('script');
     script.src = url;
     document.head.appendChild(script);
 };
 
-function callback_check(json) {
+function callbackCheck(json) {
   console.log(json);
   // check if json['continue'] == 1
 };
