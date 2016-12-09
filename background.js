@@ -26,6 +26,10 @@ chrome.storage.sync.get(["systemid_list", "pref_name"], function(result) {
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.greeting == "I am content") {
+      if (!pref_name) {
+	sendResponse({farewell: "initialize"});
+	return;
+      }
       isbn = request.isbn;
       requestCheck(app_key,isbn,["Aomori_Pref"]);
       sendResponse({
@@ -39,6 +43,7 @@ chrome.runtime.onMessage.addListener(
       sendResponse({
         farewell: "bye bye",
       });
+      //TODO send request again to update
     }
   }
 );
