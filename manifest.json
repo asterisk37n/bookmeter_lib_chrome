@@ -7,7 +7,8 @@
     "tabs",
     "activeTab",
     "<all_urls>",
-    "https://api.calil.jp/"
+    "https://api.calil.jp/",
+    "storage"
   ],
   "icons": {
     "16": "icon16.png",
