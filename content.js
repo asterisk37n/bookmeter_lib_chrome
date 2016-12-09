@@ -28,7 +28,7 @@ function showTable(response){
   amazon.parentNode.insertBefore(table_wrapper, amazon);
 }
 
-function sendLinksToBackground(isbn) {
+function sendBackgroundIsbn(isbn) {
   console.log("sending message from content to background");
   chrome.runtime.sendMessage({
       greeting: "I am content",
@@ -44,7 +44,7 @@ function sendLinksToBackground(isbn) {
   var isbn = document.location.href.split('/')[4];
   //action__items.appendChild(t);
   console.log(isbn);
-  sendLinksToBackground(isbn);
+  sendBackgroundIsbn(isbn);
 //};
 
 // recieve from background
