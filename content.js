@@ -28,12 +28,39 @@ function showTable(response){
   amazon.parentNode.insertBefore(table_wrapper, amazon);
 }
 
+
+function on_select_city(systemid_list, pref_name){
+	console.log(systemid_list, pref_name); //FireBugで表示
+    chrome.runtime.sendMessage(
+        {greeting: "I am popup",
+         systemid_list: systemid_list,
+         pref_name: pref_name},
+        function(response) {
+            console.log(response.farewell);
+        }
+    );
+}
+
+var city_selector = new CalilCitySelectDlg({
+	'appkey' : '02e69dccae66fb1e1c4c0b5364bbfedc',
+	'select_func' : on_select_city
+});
+
 function sendBackgroundIsbn(isbn) {
   console.log("sending message from content to background");
   chrome.runtime.sendMessage({
       greeting: "I am content",
       isbn: isbn
-    }, showTable);
+    }, function(response){
+	    if(response.farewell === "goodbye") {
+		    showTable(response);
+	    }else if(response.farewell === "error") {
+		    console.log("can not get library information");
+	    }else if(response.farewell === "initialize"){
+		    console.log("initialize");
+		    city_selector.showDlg();
+	    }
+    });
 }
 
 //window.onload = function() {
