@@ -1,0 +1,12 @@
+.book-availability-table{
+	margin-left: 10px;
+	text-align: center;
+}
+
+.book-availability-table th{
+	padding: 5px;
+}
+
+.book-availability-table td{
+	padding: 5px;
+}

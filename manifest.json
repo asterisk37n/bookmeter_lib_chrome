@@ -21,7 +21,8 @@
   "content_scripts": [
     {
       "matches":["https://elk.bookmeter.com/books/*"],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "css": ["content.css"]      
     }
   ],
   "page_action": {
