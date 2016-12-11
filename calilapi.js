@@ -562,7 +562,7 @@ CalilCitySelectDlg.prototype = {
 '<div id="calil_place_dialog">',
 '	<div class="calil_dlg_content">',
 '		<div style="float:right;font-size:140%;"><a href="#" class="calil_place_dialog_close">[×]</a></div>',
-'		<h3>図書館のエリアを選んでください。</h3>',
+'		<h3>図書館のエリアを選んでください。後でポップアップから変更できます。</h3>',
 '		<div id = "calil_city_selector" style="display:none;">',
 '		<a href="#" class="calil_hide_city">« 戻る</a>',
 '		<div class="calil_pref_list">&nbsp;</div>',
