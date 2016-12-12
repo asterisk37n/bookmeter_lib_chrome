@@ -49,10 +49,23 @@ chrome.runtime.onMessage.addListener(
   }
 )
 
+function splitPref(pref_name) {
+  var l = '都道府県'.split('');
+  for (var i=0; i++; i<l) {
+    x = l[i];
+    if (pref_name.indexOf('x')>0) {
+      var ix = pref_name.indexof('x');
+      pref = pref_name.substring(0,ix+1);
+      city = pref_name.substring(ix+1);
+      return [pref, city];
+    } 
+  }
+}
+
 // send to content
-function sendContentJson(message) {
+function sendContentJson(greeting, message) {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {greeting: "receiveJson",json:message}, function(response) {
+    chrome.tabs.sendMessage(tabs[0].id, {greeting: greeting,json:message}, function(response) {
       console.log(response.farewell);
     });
   });
@@ -74,13 +87,26 @@ function requestPolling(app_key, session) {
   document.head.appendChild(script);
 }
 
+function requestLibrary(appkey, pref, city) {
+  var url = "https://api.calil.jp/library?appkey="+app_key+"&pref="+pref+"&city="+city+"&format=json&calback=callbackLibrary";
+  console.log(url);
+  var script = document.createelement('script');
+  script.src = url;
+  document.head.appendChild(script);
+}
+
 function callbackCheck(json) {
   console.log(json);
-  sendContentJson(json);
+  sendContentJson("receiveBooks", json);
   if (json.continue == 1) {
     sleep(2000);
     requestPolling(app_key, json.session);    
   }
+}
+
+function callbackLibrary(json) {
+  console.log(json);
+  sendContentJson("receiveLibrary", json);
 }
 
 function saveChanges(systemid_list, pref_name) {
