@@ -1,12 +1,41 @@
-console.log('I am content', document.location.toString());
-var isbn = document.getElementsByClassName('detail__amazon')[0].getElementsByTagName('a')[0].href.split('/')[5];
+console.log("I am content", document.location.toString());
+var isbn = document.getElementsByClassName("detail__amazon")[0].getElementsByTagName("a")[0].href.split("/")[5];
 console.log(isbn);
 sendBackgroundIsbn(isbn);
 
+var libjson;
+
 var city_selector = new CalilCitySelectDlg({
-	'appkey' : '02e69dccae66fb1e1c4c0b5364bbfedc',
-	'select_func' : on_select_city
+	"appkey" : "02e69dccae66fb1e1c4c0b5364bbfedc",
+	"select_func" : on_select_city
 });
+
+// recieve from background
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    console.log(sender.tab ? "from a content script:" + sender.tab.url : "from extension");
+    console.log(request.greeting);
+    if (request.greeting == "receiveBooks") {
+      console.log(request.json);
+      if (request.json.continue == 1) {
+        sendResponse({farewell: "request libraries again"})
+        return;
+      }
+      var libs_to_show = makeDataFromJson(request.json);
+      console.log(libs_to_show);
+      if (libs_to_show) {
+        showTable(libs_to_show);        
+      } else {
+        showTable({any_library: "book not available"})
+      }
+      sendResponse({farewell: "goodbye"}); 
+    } else if (request.greeting == "receiveLibrary") {
+      libjson = request.json;
+      console.log(libjson);
+      sendResponse({farewell: "got json about library information"});
+    }
+  });
+
 
 function on_select_city(systemid_list, pref_name){
 	console.log(systemid_list, pref_name); //FireBugで表示
@@ -34,7 +63,7 @@ function showTable(response){
   table.setAttribute("class", "book-availability-table");
   table_wrapper.appendChild(table);
   
-  for(var lib in response){
+  for (var lib in response) {
 	  var tr = document.createElement("tr");
 	  var th = document.createElement("th");
 	  th.setAttribute("id", response[lib] + "_label");
@@ -68,28 +97,28 @@ function sendBackgroundIsbn(isbn) {
     });
 }
 
-// recieve from background
-chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
-    if (request.greeting == "receiveBooks"){
-      var libs_to_show ={};
-      var json = request.json;
-      for (isbn in json.books) { // just one isbn is contained
-        for (area in json.books[isbn]) {
-          var libs = json.books[isbn][area].libkey;
-          for (lib in libs) {
-            if (lib) {
-              var availability = libs[lib];
-              libs_to_show[area+lib] = availability;
-            }
-          }
+function makeDataFromJson(json) {
+  var libs_to_show ={};
+  for (isbn in json.books) { // just one isbn is contained
+    for (area in json.books[isbn]) {
+      var libs = json.books[isbn][area].libkey;
+      for (lib in libs) {
+        if (lib) {
+          var availability = libs[lib];
+          libs_to_show[area+lib] = availability;
         }
       }
-      console.log(libs_to_show);
-      showTable(libs_to_show);
-      sendResponse({farewell: "goodbye"}); 
-    } else if (request.greeting == "receiveLibrary") {
-      var json = request.json;
     }
-  });
+  }
+  return libs_to_show;
+}
+
+function getLibnameFromSystemid(json, systemid) {
+  for (var i=0; i<json.length; i++) {
+    if (json[i].systemid == systemid) {
+      return json[i].formal;
+    }
+  }
+  var libname;
+  return libname;
+}
