@@ -1,3 +1,27 @@
+window.onload = function() {
+  console.log("content script loaded window", document.location.toString());
+  var isbn = document.getElementsByClassName('detail__amazon')[0].getElementsByTagName('a')[0].href.split('/')[5];
+  console.log(isbn);
+  sendBackgroundIsbn(isbn);
+};
+
+var city_selector = new CalilCitySelectDlg({
+	'appkey' : '02e69dccae66fb1e1c4c0b5364bbfedc',
+	'select_func' : on_select_city
+});
+
+function on_select_city(systemid_list, pref_name){
+	console.log(systemid_list, pref_name); //FireBugで表示
+    chrome.runtime.sendMessage(
+        {greeting: "I am popup",
+         systemid_list: systemid_list,
+         pref_name: pref_name},
+        function(response) {
+            console.log(response.farewell);
+        }
+    );
+}
+
 function showTable(response){
   //This is a sample
   var response = { // this is a sample
@@ -28,24 +52,6 @@ function showTable(response){
   amazon.parentNode.insertBefore(table_wrapper, amazon);
 }
 
-
-function on_select_city(systemid_list, pref_name){
-	console.log(systemid_list, pref_name); //FireBugで表示
-    chrome.runtime.sendMessage(
-        {greeting: "I am popup",
-         systemid_list: systemid_list,
-         pref_name: pref_name},
-        function(response) {
-            console.log(response.farewell);
-        }
-    );
-}
-
-var city_selector = new CalilCitySelectDlg({
-	'appkey' : '02e69dccae66fb1e1c4c0b5364bbfedc',
-	'select_func' : on_select_city
-});
-
 function sendBackgroundIsbn(isbn) {
   console.log("sending message from content to background");
   chrome.runtime.sendMessage({
@@ -63,23 +69,15 @@ function sendBackgroundIsbn(isbn) {
     });
 }
 
-//window.onload = function() {
-  console.log("content script loaded window", document.location.toString());
-//  var inn = document.getElementById("main_right").getElementsByClassName("inner")[1].children[1]; for older ui
-  var group__detail = document.getElementsByClassName('group__detail')[0];
-  var t = document.createTextNode("Ohayooo");
-  var isbn = document.location.href.split('/')[4];
-  //action__items.appendChild(t);
-  console.log(isbn);
-  sendBackgroundIsbn(isbn);
-//};
-
 // recieve from background
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    console.log(sender.tab ?
-                "from a content script:" + sender.tab.url :
-                "from the extension");
-    if (request.greeting == "hello")
-      sendResponse({farewell: "goodbye"});
+    console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
+    if (request.greeting == "receiveJson"){
+      var json = request.json;
+      if(json.continue == 1) {
+        
+      }
+      sendResponse({farewell: "goodbye"}); 
+    }
   });
