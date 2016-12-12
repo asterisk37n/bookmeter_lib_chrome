@@ -2,29 +2,37 @@
 // Use of this source code is governed by xxx license that can be
 // found in the LICENSE file.
 
-console.log('Bckground script started');
+console.log("Bckground script started");
 
 var app_key = "02e69dccae66fb1e1c4c0b5364bbfedc";
 var isbn;
 var systemid_list;
 var pref_name;
 var response;
+var pref;
+var city;
+
+chrome.storage.sync.get(["systemid_list", "pref_name"], function(result) {
+  systemid_list = result.systemid_list;
+  pref_name = result.pref_name;
+  prefcity = splitPref(pref_name); //split into prefucturec and city
+  pref = prefcity[0];
+  city = prefcity[1];
+  console.log("loaded from storage");
+  console.log(systemid_list);
+  console.log(pref+" "+city);
+});
 
 chrome.tabs.onUpdated.addListener(
   function(tabId, changeInfo, tab) { // icon is visible on elk.bookmeter.com
     if (tab.url.match(/^https?:\/\/elk.bookmeter.com/) != null) {
       chrome.pageAction.show(tabId);
     }
+    if (changeInfo.status == 'complete') {
+      requestLibrary(app_key, pref, city);
+    }
   }
 );
-
-chrome.storage.sync.get(["systemid_list", "pref_name"], function(result) {
-  systemid_list = result.systemid_list;
-  pref_name = result.pref_name;
-  console.log('loaded from storage');
-  console.log(systemid_list);
-  console.log(pref_name);
-});
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
@@ -42,19 +50,23 @@ chrome.runtime.onMessage.addListener(
     } else if(request.greeting == "I am popup") {
       systemid_list = request.systemid_list;
       pref_name = request.pref_name;
-      saveChanges(systemid_list, pref_name);
+      prefcity = splitPref(pref_name);
+      pref = prefcity[0];
+      city = prefcity[1];
+      saveChanges(systemid_list, pref, city);
+      requestLibrary(app_key);
+      requestCheck(app_key, isbn, systemid_list);
       sendResponse({farewell: "bye bye"});
-      //TODO send request again to update
     }
   }
 )
 
 function splitPref(pref_name) {
-  var l = '都道府県'.split('');
-  for (var i=0; i++; i<l) {
-    x = l[i];
-    if (pref_name.indexOf('x')>0) {
-      var ix = pref_name.indexof('x');
+  var l = "都道府県".split("");
+  for (var i=0; i<l.length; i++) {
+    pre = l[i];
+    ix = pref_name.indexOf(pre);
+    if (ix > 0) {
       pref = pref_name.substring(0,ix+1);
       city = pref_name.substring(ix+1);
       return [pref, city];
@@ -74,7 +86,7 @@ function sendContentJson(greeting, message) {
 function requestCheck(app_key, isbn, systemid_list) {
     var url = "https://api.calil.jp/check?appkey="+app_key+"&isbn="+isbn+"&systemid="+systemid_list.join(",")+"&format=json&callback=callbackCheck";
     console.log(url);
-    var script = document.createElement('script');
+    var script = document.createElement("script");
     script.src = url;
     document.head.appendChild(script);
 }
@@ -82,15 +94,15 @@ function requestCheck(app_key, isbn, systemid_list) {
 function requestPolling(app_key, session) {
   var url = "https://api.calil.jp/check?appkey="+app_key+"&session="+session+"&format=json&callback=callbackCheck";
   console.log(url);
-  var script = document.createElement('script');
+  var script = document.createElement("script");
   script.src = url;
   document.head.appendChild(script);
 }
 
 function requestLibrary(appkey, pref, city) {
-  var url = "https://api.calil.jp/library?appkey="+app_key+"&pref="+pref+"&city="+city+"&format=json&calback=callbackLibrary";
+  var url = "https://api.calil.jp/library?appkey="+app_key+"&pref="+pref+"&city="+city+"&format=json&callback=callbackLibrary";
   console.log(url);
-  var script = document.createelement('script');
+  var script = document.createElement("script");
   script.src = url;
   document.head.appendChild(script);
 }
@@ -113,8 +125,8 @@ function saveChanges(systemid_list, pref_name) {
   if (!pref_name) {
     return;
   }
-  chrome.storage.sync.set({'systemid_list': systemid_list, 'pref_name': pref_name}, function() {
-    console.log('successfully saved: '+systemid_list+pref_name);
+  chrome.storage.sync.set({"systemid_list": systemid_list, "pref_name": pref_name}, function() {
+    console.log("successfully saved: "+systemid_list+pref_name);
   });
 }
 
