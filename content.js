@@ -49,30 +49,23 @@ function on_select_city(systemid_list, pref_name){
 }
 
 function showTable(response){
-  //This is a sample
-  if (response == null) {
-    response = { // this is a sample
-        "Setagaya": {availability:"Available",reserveurl:"http://sample.com"},
-        "Tamagawadai": {availability:"Unavailable",reserveurl:"http://sample2.com"}
-    };
-  }
   var table_wrapper = document.createElement("div");
   var table = document.createElement("table");
   table_wrapper.setAttribute("class", "bm-details-side--add-border-bottom");
   table.setAttribute("class", "book-availability-table");
   table_wrapper.appendChild(table);
-  
   for (var lib in response) {
-	  var tr = document.createElement("tr");
-	  var th = document.createElement("th");
-	  th.setAttribute("id", response[lib] + "_label");
-	  th.innerHTML = lib;
-	  var td = document.createElement("td");
-	  td.setAttribute("headers", response[lib] + "_label");
-	  td.innerHTML = response[lib].availability;
-	  tr.appendChild(th);
-	  tr.appendChild(td);
-	  table.appendChild(tr);
+    var tr = document.createElement("tr");
+    var th = document.createElement("th");
+    th.setAttribute("id", response[lib] + "_label");
+    th.innerHTML = lib;
+    var td = document.createElement("td");
+    td.setAttribute("headers", response[lib] + "_label");
+    td.innerHTML = response[lib].availability;
+    td.innerHTML = '<a href = '+response[lib].reserveurl+'>'+response[lib].availability+'</a>'
+    tr.appendChild(th);
+    tr.appendChild(td);
+    table.appendChild(tr);
   }
   var amazon = document.getElementsByClassName("detail__amazon")[0];
   amazon.parentNode.insertBefore(table_wrapper, amazon);
@@ -85,7 +78,6 @@ function sendBackgroundIsbn(isbn) {
       isbn: isbn
     }, function(response){
 	    if(response.farewell === "goodbye") {
-//		  showTable(response);
           console.log("background received isbn");
 	    }else if(response.farewell === "error") {
 		  console.log("can not get library information");
@@ -124,8 +116,8 @@ function getFormalnameFromLibkey(json, libkey) {
 }
 
 function isEmpty(obj) {
-  for(var prop in obj) {
-    if(obj.hasOwnProperty(prop))
+  for (var prop in obj) {
+    if (obj.hasOwnProperty(prop))
       return false;
     }
   return JSON.stringify(obj) === JSON.stringify({});
