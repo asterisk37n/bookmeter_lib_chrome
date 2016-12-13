@@ -23,7 +23,7 @@ chrome.runtime.onMessage.addListener(
       }
       var libs_to_show = makeDataFromJson(request.json);
       console.log(libs_to_show);
-      if (libs_to_show) {
+      if (!isEmpty(libs_to_show)) {
         showTable(libs_to_show);        
       } else {
         showTable({any_library: "book not available"})
@@ -35,7 +35,6 @@ chrome.runtime.onMessage.addListener(
       sendResponse({farewell: "got json about library information"});
     }
   });
-
 
 function on_select_city(systemid_list, pref_name){
 	console.log(systemid_list, pref_name); //FireBugで表示
@@ -53,8 +52,8 @@ function showTable(response){
   //This is a sample
   if (response == null) {
     response = { // this is a sample
-        "Setagaya": "Available",
-        "Tamagawadai": "Unavailable"
+        "Setagaya": {availability:"Available",reserveurl:"http://sample.com"},
+        "Tamagawadai": {availability:"Unavailable",reserveurl:"http://sample2.com"}
     };
   }
   var table_wrapper = document.createElement("div");
@@ -70,7 +69,7 @@ function showTable(response){
 	  th.innerHTML = lib;
 	  var td = document.createElement("td");
 	  td.setAttribute("headers", response[lib] + "_label");
-	  td.innerHTML = response[lib];
+	  td.innerHTML = response[lib].availability;
 	  tr.appendChild(th);
 	  tr.appendChild(td);
 	  table.appendChild(tr);
@@ -100,12 +99,14 @@ function sendBackgroundIsbn(isbn) {
 function makeDataFromJson(json) {
   var libs_to_show ={};
   for (isbn in json.books) { // just one isbn is contained
-    for (area in json.books[isbn]) {
-      var libs = json.books[isbn][area].libkey;
-      for (lib in libs) {
-        if (lib) {
-          var availability = libs[lib];
-          libs_to_show[area+lib] = availability;
+    for (systemid in json.books[isbn]) {
+      var libkeys = json.books[isbn][systemid].libkey;
+      for (libkey in libkeys) {
+        if (libkey) {
+          var availability = libkeys[libkey];
+          var formal = getFormalnameFromLibkey(libjson, libkey);
+          var reserveurl = json.books[isbn][systemid].reserveurl;
+          libs_to_show[formal] = {availability:availability, reserveurl:reserveurl};
         }
       }
     }
@@ -113,12 +114,19 @@ function makeDataFromJson(json) {
   return libs_to_show;
 }
 
-function getLibnameFromSystemid(json, systemid) {
+function getFormalnameFromLibkey(json, libkey) {
   for (var i=0; i<json.length; i++) {
-    if (json[i].systemid == systemid) {
+    if (json[i].libkey == libkey) {
       return json[i].formal;
     }
   }
-  var libname;
-  return libname;
+  return libkey;
+}
+
+function isEmpty(obj) {
+  for(var prop in obj) {
+    if(obj.hasOwnProperty(prop))
+      return false;
+    }
+  return JSON.stringify(obj) === JSON.stringify({});
 }

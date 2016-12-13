@@ -20,7 +20,7 @@ chrome.storage.sync.get(["systemid_list", "pref_name"], function(result) {
   city = prefcity[1];
   console.log("loaded from storage");
   console.log(systemid_list);
-  console.log(pref+" "+city);
+  console.log(pref_name, pref+" "+city);
 });
 
 chrome.tabs.onUpdated.addListener(
@@ -53,7 +53,7 @@ chrome.runtime.onMessage.addListener(
       prefcity = splitPref(pref_name);
       pref = prefcity[0];
       city = prefcity[1];
-      saveChanges(systemid_list, pref, city);
+      saveChanges(systemid_list, pref_name);
       requestLibrary(app_key);
       requestCheck(app_key, isbn, systemid_list);
       sendResponse({farewell: "bye bye"});
