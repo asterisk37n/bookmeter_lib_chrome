@@ -5,9 +5,11 @@
 
 .book-availability-table th{
   padding: 5px;
-  text-align: left;  
+  text-align: left;
 }
 
 .book-availability-table td{
   padding: 5px;
+  text-align: left;
+  white-space: nowrap; 
 }
