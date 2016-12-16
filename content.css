@@ -1,15 +1,19 @@
 .book-availability-table{
-  margin-left: 10px;
   text-align: center;
+  table-layout: fixed;
+  width: 278px;
 }
 
 .book-availability-table th{
-  padding: 5px;
+  padding: 5px 10px;
   text-align: left;
+  overflow: hidden;
+  width: 204px;
 }
 
 .book-availability-table td{
-  padding: 5px;
-  text-align: left;
-  white-space: nowrap; 
+  padding: 5px 10px;
+  text-align: right;
+  white-space: nowrap;
+  width: 54px;
 }

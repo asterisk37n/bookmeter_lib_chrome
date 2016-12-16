@@ -13,6 +13,8 @@ var pref;
 var city;
 
 chrome.storage.sync.get(["systemid_list", "pref_name"], function(result) {
+	if(!result.systemid_list || !result.pref_name)
+		return;
   systemid_list = result.systemid_list;
   pref_name = result.pref_name;
   prefcity = splitPref(pref_name); //split into prefucturec and city
@@ -28,9 +30,9 @@ chrome.tabs.onUpdated.addListener(
     if (tab.url.match(/^https?:\/\/elk.bookmeter.com/) != null) {
       chrome.pageAction.show(tabId);
     }
-    if (changeInfo.status == 'complete') {
-      requestLibrary(app_key, pref, city);
-    }
+    //if (changeInfo.status == 'complete') {
+      //requestLibrary(app_key, pref, city);
+    //}
   }
 );
 
@@ -54,12 +56,25 @@ chrome.runtime.onMessage.addListener(
       pref = prefcity[0];
       city = prefcity[1];
       saveChanges(systemid_list, pref_name);
-      requestLibrary(app_key);
-      requestCheck(app_key, isbn, systemid_list);
+      requestLibrary(app_key, pref, city, function(response){
+	      sendContentJson("receiveLibrary", response);
+      });
       sendResponse({farewell: "bye bye"});
+    }else if(request.greeting === "LibRequest"){
+	    if(app_key && pref && city){
+		    requestLibrary(app_key, pref, city, function(response){
+			    sendResponse({
+				    status: "success",
+				    json: response
+			    });
+		    });
+	   }else{
+		   sendResponse({
+			   status: "initialize"
+		   });
+	   }
     }
-  }
-)
+ });
 
 function splitPref(pref_name) {
   var l = "都道府県".split("");
@@ -99,12 +114,20 @@ function requestPolling(app_key, session) {
   document.head.appendChild(script);
 }
 
-function requestLibrary(appkey, pref, city) {
-  var url = "https://api.calil.jp/library?appkey="+app_key+"&pref="+pref+"&city="+city+"&format=json&callback=callbackLibrary";
-  console.log(url);
-  var script = document.createElement("script");
-  script.src = url;
-  document.head.appendChild(script);
+function requestLibrary(appkey, pref, city, callback) {
+	var URL = "https://api.calil.jp/library?appkey="+app_key+"&pref="+pref+"&city="+city+"&format=json&callback=";
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", URL, false);
+	xhr.onload = function(e){
+		if(xhr.readyState === 4){
+			if(xhr.status === 200){
+				if(callback)
+					callback(JSON.parse(xhr.response));
+			}else{
+			}
+		}
+	};
+	xhr.send();
 }
 
 function callbackCheck(json) {
