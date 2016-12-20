@@ -2,7 +2,7 @@
   "name": "読書メーター図書館検索",
   "short_name": "読書メーター図書館検索",
   "description": "読書メーターの本のページに近隣の図書館の蔵書検索結果を表示します.",
-  "version": "0.110",
+  "version": "0.200",
   "minimum_chrome_version": "16.0.884",
   "permissions": [
     "tabs",
