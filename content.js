@@ -71,6 +71,7 @@ var resultTable = {
 		}
 		if(res.continue < 0){
 			console.log("exceeded max request count");
+			this.appendMessage("TIMEOUT");
 			this.status = "COMPLETE";
 			return;
 		}
