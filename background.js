@@ -7,7 +7,7 @@ console.log("Bckground script started");
 //////////GLOBAL VARIABLES//////////
 const app_key = "02e69dccae66fb1e1c4c0b5364bbfedc";
 const baseURL = "https://api.calil.jp/";
-const MAX_REQUEST_COUNT = 5;
+const MAX_REQUEST_COUNT = 30;
 var systemid_list;
 var pref_name;
 var pref;
