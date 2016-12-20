@@ -1,118 +1,223 @@
-console.log("I am content", document.location.toString());
-var isbn = document.getElementsByClassName("detail__amazon")[0].getElementsByTagName("a")[0].href.split("/")[5];
-console.log(isbn);
-sendBackgroundIsbn(isbn);
+//////////GLOBAL VARIABLES//////////
+console.log("start to load content.js");
+var isbn;
+var initialized;
 
-var libjson;
+/**
+ * library store object
+ */
+var libStore = {
+	data: null,
+	isLoaded: false,
+	loadData: function(data){
+		this.data = data;
+		if(data) this.isLoaded = true;
+		console.log("lib list data loaded");
+	},
+	getLibName: function(query){
+		for (var i in this.data) {
+			if (this.data[i].libkey == query) {
+				return this.data[i].formal;
+			}
+		}
+		return query;
+	}
+};
 
-var city_selector = new CalilCitySelectDlg({
-	"appkey" : "02e69dccae66fb1e1c4c0b5364bbfedc",
-	"select_func" : on_select_city
+/**
+ * table object
+ */
+var resultTable = {
+	
+	dom: {
+		wrapper: null,
+		table: null
+	},
+	status: "", // INITIALIZING / LOADING / COMPLETED / BOOKS_NOT_STORED / PARAMS_NOT_FOUND / API_ERROR
+	rows: [],
+	initialized: false,
+	hasMessage: false,
+
+	init: function(){
+		if(this.initialized) return;
+		this.dom.wrapper = document.createElement("div");
+		this.dom.wrapper.setAttribute("class", "bm-details-side--add-border-bottom");
+		this.dom.table = document.createElement("table");
+		this.dom.table.setAttribute("class", "book-availability-table");
+		this.dom.wrapper.appendChild(this.dom.table);
+
+		this.appendMessage("LOADING...");
+		this.status = "INITIALIZING"; //TODO
+		this.initialized = true;
+	},
+
+	hasLibResult: function(libkey){
+		for(var lib of this.rows){
+			if(lib.libKey === libkey) return true;
+		}
+		return false;
+	},
+
+	reflectResponse: function(res){
+		if(this.hasMessage){
+			this.pop();
+			this.hasMessage = false;
+		}
+		if(!libStore.isLoaded){
+			console.log("lib data not found");
+			this.appendMessage("SELECT A CITY");
+			this.status = "PARAMS_NOT_FOUND";
+			return;
+		}
+		if(res.continue < 0){
+			console.log("exceeded max request count");
+			this.status = "COMPLETE";
+			return;
+		}
+		for (isbn in res.books) { // just one isbn is contained
+			for (systemid in res.books[isbn]) {
+				var libkeys = res.books[isbn][systemid].libkey;
+				var url = res.books[isbn][systemid].reserveurl;
+				for (libkey in libkeys) {
+					if(libkey && !this.hasLibResult(libkey)){
+						var lib = new LibResult(libkey, libkeys[libkey], url);
+						this.append(lib);
+					}
+				}
+			}
+		}
+		if(res.continue === 1){
+			this.appendMessage("LOADING...");
+			this.status = "LOADING";
+		}else if(res.continue === 0){
+			if(this.rows.length === 0){
+				this.status = "BOOKS_NOT_STORED";
+				this.appendMessage("NOT STORED");
+			}else{
+				this.status = "COMPLETED";
+			}
+		}
+	},
+
+	append: function(lib){
+    		var tr = document.createElement("tr");
+		var th = document.createElement("th");
+    		th.innerHTML = lib.libName;
+		var td = document.createElement("td");
+		if(lib.url){
+    			td.innerHTML = '<a href = '+lib.url+'>'+lib.availability+'</a>';
+		}else{
+			td.innerHTML = lib.availability;
+		}
+   		tr.appendChild(th);
+    		tr.appendChild(td);
+    		
+		this.rows.push(lib);
+		this.dom.table.appendChild(tr);
+	},
+
+	appendMessage: function(message){
+    		var tr = document.createElement("tr");
+		var td = document.createElement("td");
+		td.setAttribute("colspan","2");
+    		td.innerHTML = message;
+    		tr.appendChild(td);
+    		
+		this.rows.push({message:message});
+		this.dom.table.appendChild(tr);
+		this.hasMessage = true;
+	},
+
+	pop: function(){
+		this.dom.table.removeChild(this.dom.table.childNodes[this.rows.length-1]);
+		this.rows.splice(this.rows.length-1,1);
+	},
+
+	reset: function(){
+		this.rows = [];
+		if(this.dom.table) this.dom.table.innerHTML = "";
+		this.appendMessage("LOADING...");
+		this.status = "LOADING";
+		this.show();
+		console.log("table has been reset");
+	},
+
+	show: function(){
+		var amazon = document.getElementsByClassName("detail__amazon")[0];
+		amazon.parentNode.insertBefore(this.dom.wrapper, amazon);
+	}
+};
+
+
+//////////CLASS DEFINITION//////////
+
+/**
+ * table row class
+ * @param {string} libkey
+ * @param {string} availability
+ * @param {string} url
+ * @return this
+ */
+var LibResult = function(libkey, availability, url){
+
+	this.libKey = libkey;
+	this.libName = libStore.getLibName(libkey);
+	this.availability = availability;
+	this.url = url;
+
+	return this;
+};
+
+//////////EVENT LISTENER//////////
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+	if(request.greeting === "receiveBooks"){
+		console.log("received books availability");
+		resultTable.reflectResponse(request.json);
+	}else if(request.greeting == "receiveLibrary"){
+		libStore.loadData(request.json);
+		resultTable.reset();
+		sendBackgroundIsbn(isbn);
+	}else if(request.greeting === "init"){ // this is called when url changed
+		console.log("changeInfo.status has been become complete");
+		if(!initialized) init();
+		//TODO: replace this function with more appropriate one.
+		//	I'm using this in order to invoke init() after loading new page.
+		//	If we can handle the event, it's the best.
+		else setTimeout(refresh, 2000);
+	}else if(request.greeting === "debug"){
+		console.log(request.message);
+	}
 });
 
-// recieve from background
-chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    console.log(sender.tab ? "from a content script:" + sender.tab.url : "from extension");
-    console.log(request.greeting);
-    if (request.greeting == "receiveBooks") {
-      console.log(request.json);
-      if (request.json.continue == 1) {
-        sendResponse({farewell: "request libraries again"})
-        return;
-      }
-      var libs_to_show = makeDataFromJson(request.json);
-      console.log(libs_to_show);
-      if (!isEmpty(libs_to_show)) {
-        showTable(libs_to_show);        
-      } else {
-        showTable({any_library: "book not available"})
-      }
-      sendResponse({farewell: "goodbye"}); 
-    } else if (request.greeting == "receiveLibrary") {
-      libjson = request.json;
-      console.log(libjson);
-      sendResponse({farewell: "got json about library information"});
-    }
-  });
+//////////INITIAL PROCESS//////////
 
-function on_select_city(systemid_list, pref_name){
-	console.log(systemid_list, pref_name); //FireBugで表示
-    chrome.runtime.sendMessage(
-        {greeting: "I am popup",
-         systemid_list: systemid_list,
-         pref_name: pref_name},
-        function(response) {
-            console.log(response.farewell);
-        }
-    );
+function init(){
+	resultTable.init();
+	console.log("lib request has been sent to background");
+	chrome.runtime.sendMessage({greeting: "LibRequest"}, function(response){
+		if(response.status === "SUCCESS"){
+			libStore.loadData(response.json);
+			sendBackgroundIsbn(isbn);
+		}else if(response.status === "ERROR"){
+			console.log("API Error");
+		}else if(response.status === "PARAMS_NOT_FOUND"){ // called when appkey/pref/city info was not found
+			if(resultTable.hasMessage)
+				resultTable.pop();
+			resultTable.appendMessage("SELECT A CITY");
+			resultTable.status = "PARAMS_NOT_FOUND";
+		}
+	});
+	refresh();
+	initialized = true;
 }
 
-function showTable(response){
-  var table_wrapper = document.createElement("div");
-  var table = document.createElement("table");
-  table_wrapper.setAttribute("class", "bm-details-side--add-border-bottom");
-  table.setAttribute("class", "book-availability-table");
-  table_wrapper.appendChild(table);
-  for (var lib in response) {
-    var tr = document.createElement("tr");
-    var th = document.createElement("th");
-    th.setAttribute("id", response[lib] + "_label");
-    th.innerHTML = lib;
-    var td = document.createElement("td");
-    td.setAttribute("headers", response[lib] + "_label");
-    td.innerHTML = response[lib].availability;
-    td.innerHTML = '<a href = '+response[lib].reserveurl+'>'+response[lib].availability+'</a>'
-    tr.appendChild(th);
-    tr.appendChild(td);
-    table.appendChild(tr);
-  }
-  var amazon = document.getElementsByClassName("detail__amazon")[0];
-  amazon.parentNode.insertBefore(table_wrapper, amazon);
-}
+//////////UTILITY FUNCTIONS//////////
 
-function sendBackgroundIsbn(isbn) {
-  console.log("sending message from content to background");
-  chrome.runtime.sendMessage({
-      greeting: "I am content",
-      isbn: isbn
-    }, function(response){
-	    if(response.farewell === "goodbye") {
-          console.log("background received isbn");
-	    }else if(response.farewell === "error") {
-		  console.log("can not get library information");
-	    }else if(response.farewell === "initialize"){
-          console.log("initialize");
-          city_selector.showDlg();
-	    }
-    });
-}
-
-function makeDataFromJson(json) {
-  var libs_to_show ={};
-  for (isbn in json.books) { // just one isbn is contained
-    for (systemid in json.books[isbn]) {
-      var libkeys = json.books[isbn][systemid].libkey;
-      for (libkey in libkeys) {
-        if (libkey) {
-          var availability = libkeys[libkey];
-          var formal = getFormalnameFromLibkey(libjson, libkey);
-          var reserveurl = json.books[isbn][systemid].reserveurl;
-          libs_to_show[formal] = {availability:availability, reserveurl:reserveurl};
-        }
-      }
-    }
-  }
-  return libs_to_show;
-}
-
-function getFormalnameFromLibkey(json, libkey) {
-  for (var i=0; i<json.length; i++) {
-    if (json[i].libkey == libkey) {
-      return json[i].formal;
-    }
-  }
-  return libkey;
+function refresh(){
+	isbn = document.getElementsByClassName("detail__amazon")[0].getElementsByTagName("a")[0].href.split("/")[5];
+	resultTable.reset();
+	if(initialized) sendBackgroundIsbn(isbn);
 }
 
 function isEmpty(obj) {
@@ -121,4 +226,18 @@ function isEmpty(obj) {
       return false;
     }
   return JSON.stringify(obj) === JSON.stringify({});
+}
+
+function sendBackgroundIsbn(isbn){
+	console.log("isbn:" + isbn + " has been sent to background");
+	chrome.runtime.sendMessage({
+		greeting: "I am content",
+		isbn: isbn
+	}, function(response){
+		if(response.status === "ERROR") {
+			console.log("API Error");
+		}else if(response.status === "SUCCESS"){
+			//TODO
+		}
+	});
 }
