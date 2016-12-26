@@ -2,7 +2,7 @@
   "name": "読書メーター 図書館検索",
   "short_name": "読書メーター 図書館検索",
   "description": "読書メーターに近隣の図書館の蔵書検索結果を表示します.",
-  "version": "0.202",
+  "version": "0.203",
   "minimum_chrome_version": "16.0.884",
   "permissions": [
     "tabs",
@@ -22,7 +22,7 @@
   },
   "content_scripts": [
     {
-      "matches":["https://elk.bookmeter.com/books/*"],
+      "matches":["https://elk.bookmeter.com/*"],
       "js": ["jquery-3.1.1.min.js", "calilapi.js", "content.js"],
       "css": ["calilapi.css", "content.css"]
     }
