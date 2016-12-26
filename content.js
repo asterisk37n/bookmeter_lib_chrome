@@ -185,7 +185,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 		//TODO: replace this function with more appropriate one.
 		//	I'm using this in order to invoke init() after loading new page.
 		//	If we can handle the event, it's the best.
-		else setTimeout(refresh, 2000);
+		else if(document.location.pathname.match(/^\/books/)) setTimeout(refresh, 2000);
 	}else if(request.greeting === "debug"){
 		console.log(request.message);
 	}
