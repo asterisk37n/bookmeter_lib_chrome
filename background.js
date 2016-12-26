@@ -69,7 +69,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){ // icon is v
 	if(tab.url.match(/^https?:\/\/elk.bookmeter.com/)){
 		chrome.pageAction.show(tabId);
 	}
-	if(changeInfo.status === "complete"){
+	if(tab.url.match(/^https?:\/\/elk.bookmeter.com\/books/) && changeInfo.status === "complete"){
 		sendContentJson("init", "tab updated"); //TODO: 
 	}
 });
