@@ -194,7 +194,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 //////////INITIAL PROCESS//////////
 
 function init(){
-	if(!document.location.pathname.match(/^\/books/)) return;
+	if (!document.location.pathname.match(/^\/books/)) return;
 	resultTable.init();
 	console.log("lib request has been sent to background");
 	chrome.runtime.sendMessage({greeting: "LibRequest"}, function(response){
