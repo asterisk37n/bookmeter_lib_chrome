@@ -194,13 +194,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 //////////INITIAL PROCESS//////////
 
 function init(){
-	if (!document.location.pathname.match(/^\/books/)) return;
 	resultTable.init();
 	console.log("lib request has been sent to background");
 	chrome.runtime.sendMessage({greeting: "LibRequest"}, function(response){
 		if(response.status === "SUCCESS"){
 			libStore.loadData(response.json);
-			sendBackgroundIsbn(isbn);
+			if(isbn) sendBackgroundIsbn(isbn);
 		}else if(response.status === "ERROR"){
 			console.log("API Error");
 		}else if(response.status === "PARAMS_NOT_FOUND"){ // called when appkey/pref/city info was not found
@@ -210,7 +209,9 @@ function init(){
 			resultTable.status = "PARAMS_NOT_FOUND";
 		}
 	});
-	refresh();
+	if (document.location.pathname.match(/^\/books/)){
+		refresh();
+	}
 	initialized = true;
 }
 
