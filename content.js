@@ -178,7 +178,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 	}else if(request.greeting == "receiveLibrary"){
 		libStore.loadData(request.json);
 		resultTable.reset();
-		sendBackgroundIsbn(isbn);
+		if(isbn) sendBackgroundIsbn(isbn);
 	}else if(request.greeting === "init"){ // this is called when url changed
 		console.log("changeInfo.status has been become complete");
 		if(!initialized) init();
