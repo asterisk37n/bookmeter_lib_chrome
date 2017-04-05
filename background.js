@@ -66,7 +66,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 });
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){ // icon is visible on elk.bookmeter.com
-	if(tab.url.match(/^https?:\/\/elk.bookmeter.com/)){
+	if(tab.url.match(/^https?:\/\/(elk.)?bookmeter.com/)){
 		chrome.pageAction.show(tabId);
 	}
 	if(changeInfo.status === "complete"){
